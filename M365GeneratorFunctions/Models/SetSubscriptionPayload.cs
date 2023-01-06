@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-namespace GraphSampleFunctions.Models
+namespace M365GeneratorFunctions.Models
 {
     // Class to represent the payload sent to the
     // SetSubscription function

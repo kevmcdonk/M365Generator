@@ -3,11 +3,12 @@
 
 using Microsoft.Graph;
 
-namespace GraphSampleFunctions.Services
+namespace M365GeneratorFunctions.Services
 {
     public interface IGraphClientService
     {
         public GraphServiceClient? GetUserGraphClient(string userAssertion);
+        public Task<GraphServiceClient> GetUserGraphClient();
         public GraphServiceClient? GetAppGraphClient();
     }
 }

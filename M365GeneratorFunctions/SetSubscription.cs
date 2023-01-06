@@ -8,14 +8,14 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using GraphSampleFunctions.Models;
-using GraphSampleFunctions.Services;
+using M365GeneratorFunctions.Models;
+using M365GeneratorFunctions.Services;
 
-namespace GraphSampleFunctions
+namespace M365GeneratorFunctions
 {
     public class SetSubscription
     {
-        public static readonly string ClientState = "GraphSampleFunctionState";
+        public static readonly string ClientState = "M365GeneratorFunctionstate";
         private readonly ITokenValidationService _tokenValidationService;
         private readonly IGraphClientService _graphClientService;
         private readonly IConfiguration _config;

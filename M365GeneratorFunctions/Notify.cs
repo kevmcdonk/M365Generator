@@ -6,9 +6,9 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using GraphSampleFunctions.Services;
+using M365GeneratorFunctions.Services;
 
-namespace GraphSampleFunctions
+namespace M365GeneratorFunctions
 {
     public class Notify
     {

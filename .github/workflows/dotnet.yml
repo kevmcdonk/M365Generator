@@ -10,7 +10,7 @@ jobs:
   build:
     defaults:
       run:
-        working-directory: GraphSampleFunctions/
+        working-directory: M365GeneratorFunctions/
 
     runs-on: ubuntu-latest
 

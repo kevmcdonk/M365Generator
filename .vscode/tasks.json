@@ -7,7 +7,7 @@
       "label": "clean",
       "command": "dotnet",
       "options": {
-        "cwd": "${workspaceFolder}/GraphSampleFunctions"
+        "cwd": "${workspaceFolder}/M365GeneratorFunctions"
       },
       "args": [
         "clean",
@@ -21,7 +21,7 @@
       "label": "build",
       "command": "dotnet",
       "options": {
-        "cwd": "${workspaceFolder}/GraphSampleFunctions"
+        "cwd": "${workspaceFolder}/M365GeneratorFunctions"
       },
       "args": [
         "build",
@@ -47,7 +47,7 @@
       "type": "process",
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/GraphSampleFunctions"
+        "cwd": "${workspaceFolder}/M365GeneratorFunctions"
       }
     },
     {
@@ -66,7 +66,7 @@
       },
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/GraphSampleFunctions"
+        "cwd": "${workspaceFolder}/M365GeneratorFunctions"
       }
     },
     {
@@ -82,7 +82,7 @@
       "type": "process",
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/GraphSampleFunctions"
+        "cwd": "${workspaceFolder}/M365GeneratorFunctions"
       }
     },
     {
@@ -99,14 +99,14 @@
       "dependsOn": "clean release (functions)",
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/GraphSampleFunctions"
+        "cwd": "${workspaceFolder}/M365GeneratorFunctions"
       }
     },
     {
       "type": "func",
       "dependsOn": "build (functions)",
       "options": {
-        "cwd": "${workspaceFolder}/GraphSampleFunctions/bin/Debug/net7.0"
+        "cwd": "${workspaceFolder}/M365GeneratorFunctions/bin/Debug/net7.0"
       },
       "command": "host start",
       "isBackground": true,

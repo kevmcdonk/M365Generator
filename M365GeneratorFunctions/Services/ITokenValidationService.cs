@@ -3,7 +3,7 @@
 
 using Microsoft.Azure.Functions.Worker.Http;
 
-namespace GraphSampleFunctions.Services
+namespace M365GeneratorFunctions.Services
 {
     public interface ITokenValidationService
     {

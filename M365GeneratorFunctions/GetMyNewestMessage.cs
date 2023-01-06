@@ -6,22 +6,22 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using GraphSampleFunctions.Services;
+using M365GeneratorFunctions.Services;
 
-namespace GraphSampleFunctions
+namespace M365GeneratorFunctions
 {
     public class GetMyNewestMessage
     {
-        private readonly ITokenValidationService _tokenValidationService;
+        // private readonly ITokenValidationService _tokenValidationService;
         private readonly IGraphClientService _graphClientService;
         private readonly ILogger _logger;
 
         public GetMyNewestMessage(
-            ITokenValidationService tokenValidationService,
+            // ITokenValidationService tokenValidationService,
             IGraphClientService graphClientService,
             ILoggerFactory loggerFactory)
         {
-            _tokenValidationService = tokenValidationService;
+            // _tokenValidationService = tokenValidationService;
             _graphClientService = graphClientService;
             _logger = loggerFactory.CreateLogger<GetMyNewestMessage>();
         }
@@ -33,21 +33,21 @@ namespace GraphSampleFunctions
             _logger.LogInformation("GetMyNewMessage function triggered.");
 
             // Validate the bearer token
-            var bearerToken = await _tokenValidationService
+            /*var bearerToken = await _tokenValidationService
                 .ValidateAuthorizationHeaderAsync(req);
             if (string.IsNullOrEmpty(bearerToken))
             {
                 // If token wasn't returned it isn't valid
                 return req.CreateResponse(HttpStatusCode.Unauthorized);
             }
-
-            var graphClient = _graphClientService.GetUserGraphClient(bearerToken);
+            */
+            var graphClient = await _graphClientService.GetUserGraphClient();
             if (graphClient == null)
             {
                 _logger.LogError("Could not create a Graph client for the user");
                 return req.CreateResponse(HttpStatusCode.InternalServerError);
             }
-
+            
             // Get the user's newest message in inbox
             // GET /me/mailFolders/inbox/messages
             var messagePage = await graphClient.Me

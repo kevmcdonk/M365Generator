@@ -5,8 +5,10 @@ using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Azure.Services.AppAuthentication;
+using System.Net.Http.Headers;
 
-namespace GraphSampleFunctions.Services
+namespace M365GeneratorFunctions.Services
 {
     public class GraphClientService : IGraphClientService
     {
@@ -39,6 +41,25 @@ namespace GraphSampleFunctions.Services
 
             return new GraphServiceClient(onBehalfOfCredential);
         }
+
+        public async Task<GraphServiceClient> GetUserGraphClient()
+{
+    var azureServiceTokenProvider = new AzureServiceTokenProvider();
+    string accessToken = await azureServiceTokenProvider
+        .GetAccessTokenAsync("https://graph.microsoft.com/");
+
+    var graphServiceClient = new GraphServiceClient(
+        new DelegateAuthenticationProvider((requestMessage) =>
+    {
+        requestMessage
+            .Headers
+            .Authorization = new AuthenticationHeaderValue("bearer", accessToken);
+
+        return Task.CompletedTask;
+    }));
+
+    return graphServiceClient;
+}
 
         public GraphServiceClient? GetAppGraphClient()
         {

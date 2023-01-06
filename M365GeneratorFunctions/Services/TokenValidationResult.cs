@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-namespace GraphSampleFunctions.Services
+namespace M365GeneratorFunctions.Services
 {
     public class TokenValidationResult
     {

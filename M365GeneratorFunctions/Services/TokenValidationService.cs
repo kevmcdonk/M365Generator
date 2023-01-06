@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
-namespace GraphSampleFunctions.Services
+namespace M365GeneratorFunctions.Services
 {
     public class TokenValidationService : ITokenValidationService
     {

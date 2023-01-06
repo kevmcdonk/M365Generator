@@ -142,7 +142,7 @@ This sample requires three Azure AD application registrations:
     - `YOUR_TENANT_ID_HERE` - replace with your tenant ID
     - `YOUR_AZURE_FUNCTION_CLIENT_ID_HERE` - replace with the client ID for **Graph Azure Function**
 
-1. Use `dotnet user-secrets set` in the **GraphSampleFunctions** directory to set the following values.
+1. Use `dotnet user-secrets set` in the **M365GeneratorFunctions** directory to set the following values.
 
     - apiClientId - the client ID for **Graph Azure Function**
     - apiClientSecret - the client secret for **Graph Azure Function**
@@ -156,7 +156,7 @@ This sample requires three Azure AD application registrations:
 
 ## Run the sample
 
-The following command (run in the **GraphSampleFunctions** directory) will start the Azure Function project locally on your machine.
+The following command (run in the **M365GeneratorFunctions** directory) will start the Azure Function project locally on your machine.
 
 ```bash
 func start

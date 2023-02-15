@@ -42,32 +42,43 @@ namespace M365GeneratorFunctions.Services
             return new GraphServiceClient(onBehalfOfCredential);
         }
 
-        public async Task<GraphServiceClient> GetUserGraphClient()
-{
-    var azureServiceTokenProvider = new AzureServiceTokenProvider();
-    string accessToken = await azureServiceTokenProvider
-        .GetAccessTokenAsync("https://graph.microsoft.com/");
+        public GraphServiceClient GetUserGraphClient()
+        {
+            if (_appGraphClient == null)
+            {
+            var tenantId = _config["AZURE_TENANTID"];
+            var clientId = _config["AZURE_CLIENT_ID"];
+            var username = _config["AZURE_USERNAME"];
+            var password = _config["AZURE_PASSWORD"];
 
-    var graphServiceClient = new GraphServiceClient(
-        new DelegateAuthenticationProvider((requestMessage) =>
-    {
-        requestMessage
-            .Headers
-            .Authorization = new AuthenticationHeaderValue("bearer", accessToken);
-
-        return Task.CompletedTask;
-    }));
-
-    return graphServiceClient;
-}
+            var creds = new UsernamePasswordCredential(username, password, tenantId, clientId);
+            _appGraphClient = new GraphServiceClient(creds);
+            }
+            return _appGraphClient;
+        }
 
         public GraphServiceClient? GetAppGraphClient()
         {
             if (_appGraphClient == null)
             {
+                var tenantId = _config["AZURE_TENANTID"];
+                var clientId = _config["AZURE_CLIENT_ID"];
+                var clientSecret = _config["apiClientSecret"];
+
+                var creds = new ClientSecretCredential(tenantId, clientId, clientSecret);
+                _appGraphClient = new GraphServiceClient(creds);
+            }
+
+            return _appGraphClient;
+        }
+
+        public GraphServiceClient? GetUserGraphClient(string[] scopes)
+        {
+            if (_appGraphClient == null)
+            {
                 var tenantId = _config["tenantId"];
-                var clientId = _config["webhookClientId"];
-                var clientSecret = _config["webhookClientSecret"];
+                var clientId = _config["apiClientId"];
+                var clientSecret = _config["apiClientSecret"];
 
                 if (string.IsNullOrEmpty(tenantId) ||
                     string.IsNullOrEmpty(clientId) ||
@@ -77,10 +88,17 @@ namespace M365GeneratorFunctions.Services
                     return null;
                 }
 
+                Func<DeviceCodeInfo, CancellationToken, Task> callback = (code, cancellation) => {
+                    Console.WriteLine(code.Message);
+                    return Task.FromResult(0);
+                };
+
                 var clientSecretCredential = new ClientSecretCredential(
                     tenantId, clientId, clientSecret);
 
-                _appGraphClient = new GraphServiceClient(clientSecretCredential);
+                    var deviceCodeCredential = new DeviceCodeCredential(callback, tenantId, clientId, null);
+
+                _appGraphClient = new GraphServiceClient(deviceCodeCredential, scopes);
             }
 
             return _appGraphClient;

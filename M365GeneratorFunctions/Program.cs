@@ -13,7 +13,7 @@ var host = new HostBuilder()
         config.AddUserSecrets(Assembly.GetExecutingAssembly(), false);
     })
     .ConfigureServices(services => {
-        //services.AddSingleton<ITokenValidationService, TokenValidationService>();
+        services.AddSingleton<ITokenValidationService, TokenValidationService>();
         services.AddSingleton<IGraphClientService, GraphClientService>();
     })
     .Build();

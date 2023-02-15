@@ -8,7 +8,8 @@ namespace M365GeneratorFunctions.Services
     public interface IGraphClientService
     {
         public GraphServiceClient? GetUserGraphClient(string userAssertion);
-        public Task<GraphServiceClient> GetUserGraphClient();
+        public GraphServiceClient? GetUserGraphClient(string[] scopes);
+        public GraphServiceClient GetUserGraphClient();
         public GraphServiceClient? GetAppGraphClient();
     }
 }

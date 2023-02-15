@@ -32,16 +32,8 @@ namespace M365GeneratorFunctions
         {
             _logger.LogInformation("GetMyNewMessage function triggered.");
 
-            // Validate the bearer token
-            /*var bearerToken = await _tokenValidationService
-                .ValidateAuthorizationHeaderAsync(req);
-            if (string.IsNullOrEmpty(bearerToken))
-            {
-                // If token wasn't returned it isn't valid
-                return req.CreateResponse(HttpStatusCode.Unauthorized);
-            }
-            */
-            var graphClient = await _graphClientService.GetUserGraphClient();
+            var graphClient = _graphClientService.GetUserGraphClient();
+            // var graphClient = _graphClientService.GetUserGraphClient(scopes);
             if (graphClient == null)
             {
                 _logger.LogError("Could not create a Graph client for the user");

@@ -10,6 +10,8 @@ using Microsoft.Graph;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using M365GeneratorFunctions.Services;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace M365GeneratorFunctions
 {
@@ -67,6 +69,17 @@ namespace M365GeneratorFunctions
                 var response = req.CreateResponse(HttpStatusCode.InternalServerError);
                 // Return the message in the response
                 response.WriteString("There were only " + teamFoundCount.ToString() + " teams found");
+                string[] teamNames = await GetRandomTeamNames();
+                foreach (string teamName in teamNames) {
+                    if (teamName != "") {
+                        string teamNameToCreate = teamName;
+                        if (teamName.StartsWith("-")) {
+                            teamNameToCreate = teamName.Substring(1,teamName.Length-1);
+                        }
+                        await CreateTeam(teamNameToCreate, graphClient);
+                    }
+                }
+               
                 return response;
 
                 //TODO: Create the Teams
@@ -101,31 +114,64 @@ namespace M365GeneratorFunctions
             return false;
         }
 
+        private async Task CreateTeam(string teamName, GraphServiceClient graphClient) {
+            var team = new Team
+            {
+                DisplayName = teamName,
+                Description = teamName,
+                Members = new TeamMembersCollectionPage()
+                {
+                    new AadUserConversationMember
+                    {
+                        Roles = new List<String>()
+                        {
+                            "owner"
+                        },
+                        AdditionalData = new Dictionary<string, object>()
+                        {
+                            {"user@odata.bind", "https://graph.microsoft.com/v1.0/users('kevin@mcd79.com')"}
+                        }
+                    }
+                },
+                AdditionalData = new Dictionary<string, object>()
+                {
+                    {"template@odata.bind", "https://graph.microsoft.com/v1.0/teamsTemplates('standard')"}
+                }
+            };
+
+            await graphClient.Teams
+                .Request()
+            	.AddAsync(team);
+        }
+
         private async Task<string[]> GetRandomTeamNames(CancellationToken cancellationToken = default) {
             HttpClient Client = new HttpClient();
-            var openAIKey = _config["AZURE_PASSWORD"];
+            var openAIKey = _config["AZURE_OPENAI_ID"];
             Client.DefaultRequestHeaders.Add("User-Agent", "OpenAI-DotNet");
-            Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", openAIKey);
+            Client.DefaultRequestHeaders.Add("api-key", openAIKey);
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
 
-            var bodyText = "{\"prompt\": \"Generate a list of teams for Microsoft Teams projects\",  \"max_tokens\": 60,\"temperature\": 0.8,\"frequency_penalty\": 0,\"presence_penalty\": 0,\"top_p\": 1,\"best_of\": 1,\"stop\": null}";
+
+            string bodyText = "{\"prompt\": \"Generate a list of teams for Microsoft Teams projects\",  \"max_tokens\": 60,\"temperature\": 0.8,\"frequency_penalty\": 0,\"presence_penalty\": 0,\"top_p\": 1,\"best_of\": 1,\"stop\": null}";
             //var jsonContent = JsonSerializer.Serialize(completionRequest, Api.JsonSerializationOptions);
-            var response = await Client.PostAsync("https://m365generator.openai.azure.com/openai/deployments/text-davinci-002/completions?api-version=2022-12-01", bodyText, cancellationToken).ConfigureAwait(false);
-            var responseAsString = await response.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            HttpContent content = new StringContent(bodyText);
+            string endPoint = "https://m365generator.openai.azure.com/openai/deployments/text-davinci-002/completions?api-version=2022-12-01"; //_config["AZURE_OPENAI_ENDPOINT"];
+            //var response = await Client.PostAsync(endPoint, content, cancellationToken).ConfigureAwait(false);
+            //var responseText = await response.Content.ReadAsStringAsync();
+
+
+            
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, endPoint);
+            request.Content = new StringContent(bodyText, Encoding.UTF8, "application/json");
+            var response = await Client.SendAsync(request);
+            var responseAsString = await response.Content.ReadAsStringAsync();
+            dynamic stuff = JsonConvert.DeserializeObject(responseAsString);
+            return stuff.choices[0].text.ToString().Split("\n");
             //return DeserializeResult(response, responseAsString);
-            return new string[] { "test", "test2" };
+            //return new string[] { "test", "test2" };
             /*
-            curl https://m365generator.openai.azure.com/openai/deployments/text-davinci-002/completions?api-version=2022-12-01 \
-  -H "Content-Type: application/json" \
-  -H "api-key: YOUR_API_KEY" \
-  -d '{
-  "prompt": "Generate a list of teams for Microsoft Teams projects\n\n-IT support team\n-Marketing team\n-Sales team\n-Human Resources team\n-Finance team\n-Legal team\n-Information Technology team\n-Product Development team\n-Customer Service team",
-  "max_tokens": 60,
-  "temperature": 0.8,
-  "frequency_penalty": 0,
-  "presence_penalty": 0,
-  "top_p": 1,
-  "best_of": 1,
-  "stop": null
+            "{\"id\":\"cmpl-6l30pLDiVwr6mhvjvS3F0Rk90PEwS\",\"object\":\"text_completion\",\"created\":1676671015,\"model\":\"text-davinci-002\",\"choices\":[{\"text\":\"\\n\\n1. Engineering\\n2. Marketing\\n3. Sales\\n4. Customer Support\\n5. Human Resources\\n6. Accounting\\n7. IT\\n8. Facilities\\n9. Security\\n10. Legal\",\"index\":0,\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":10,\"completion_tokens\":43,\"total_tokens\":53}}\n"
+
 }'*/
         }
     }

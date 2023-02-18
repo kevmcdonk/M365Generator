@@ -115,33 +115,53 @@ namespace M365GeneratorFunctions
         }
 
         private async Task CreateTeam(string teamName, GraphServiceClient graphClient) {
-            var team = new Team
+
+            var additionalData = new Dictionary<string, object>()
+    {
+        {"owners@odata.bind", new List<string>()},
+        {"members@odata.bind", new List<string>()}
+    };
+(additionalData["members@odata.bind"] as List<string>).Add("https://graph.microsoft.com/v1.0/users/48e8a1ab-0d3a-4f9b-b200-e9e9d1437a2b");
+(additionalData["owners@odata.bind"] as List<string>).Add("https://graph.microsoft.com/v1.0/users/48e8a1ab-0d3a-4f9b-b200-e9e9d1437a2b");
+
+            var newGroup = new Group 
             {
                 DisplayName = teamName,
+                MailNickname = teamName.Replace(" ",""),
                 Description = teamName,
-                Members = new TeamMembersCollectionPage()
-                {
-                    new AadUserConversationMember
-                    {
-                        Roles = new List<String>()
-                        {
-                            "owner"
-                        },
-                        AdditionalData = new Dictionary<string, object>()
-                        {
-                            {"user@odata.bind", "https://graph.microsoft.com/v1.0/users('kevin@mcd79.com')"}
-                        }
-                    }
-                },
-                AdditionalData = new Dictionary<string, object>()
-                {
-                    {"template@odata.bind", "https://graph.microsoft.com/v1.0/teamsTemplates('standard')"}
-                }
+                Visibility = "Private",
+                GroupTypes = new List<String>(){ "Unified"},
+                MailEnabled=true,
+                SecurityEnabled=false,
+                AdditionalData = additionalData
             };
 
-            await graphClient.Teams
-                .Request()
-            	.AddAsync(team);
+            Group createdGroup = await graphClient.Groups
+            .Request()
+            .AddAsync(newGroup);
+
+            var team = new Team
+{
+	MemberSettings = new TeamMemberSettings
+	{
+		AllowCreatePrivateChannels = true,
+		AllowCreateUpdateChannels = true
+	},
+	MessagingSettings = new TeamMessagingSettings
+	{
+		AllowUserEditMessages = true,
+		AllowUserDeleteMessages = true
+	},
+	FunSettings = new TeamFunSettings
+	{
+		AllowGiphy = true,
+		GiphyContentRating = GiphyRatingType.Strict
+	}
+};
+Thread.Sleep(15000);
+await graphClient.Groups[createdGroup.Id].Team
+	.Request()
+	.PutAsync(team);
         }
 
         private async Task<string[]> GetRandomTeamNames(CancellationToken cancellationToken = default) {
